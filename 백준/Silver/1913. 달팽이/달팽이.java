@@ -8,42 +8,47 @@ public class Main {
         int M = Integer.parseInt(br.readLine());
 
         int[][] snail = new int[N][N];  // 저장할 달팽이 배열 선언
-        int value = 1;  // 배열에 저장할 값    
-        int cols = N / 2;   // 시작 열 번호
-        int rows = N / 2;   // 시작 행 번호
+        int value = N * N;  // 배열에 저장할 값
+        int x = 0, y = 0;
 
-        snail[N / 2][N / 2] = 1;    // 첫 번째 값 초기화
-        
-        // 달팽이 배열 값 저장
-        for (int i = 1; i <= N; i++) {
-            for (int j = 1; j <= i; j++) {
-                snail[cols][rows] = value;  // 값 저장
-                value++;
-                cols += (int) Math.pow(-1, i);  // 열 이동
-            }
-            for (int j = 1; j <= i && cols >= 0; j++) {
-                snail[cols][rows] = value;  // 값 저장
-                value++;
-                rows += (int) Math.pow(-1, i - 1);  // 행 이동
+        // 방향 (우 -> 하 -> 좌 -> 상)
+        int[] dx = {1, 0, -1, 0};
+        int[] dy = {0, 1, 0, -1};
+        int dir = 0;    // 방향
+        int step = 1;   // 이동 횟수
+
+        snail[x][y] = value--;
+
+        while (value > 0) {
+            while (true) {
+                int nx = x + dx[dir];
+                int ny = y + dy[dir];
+                if (nx < 0 || nx >= N || ny < 0 || ny >= N || snail[nx][ny] != 0) {
+                    dir = (dir + 1) % 4;    // 방향전환
+                    break;
+                }
+                snail[nx][ny] = value--;
+                x = nx;  // x 좌표 갱신
+                y = ny;  // y 좌표 갱신
             }
         }
-        
+
+        // 찾아야할 좌표값
+        int ansX = 0, ansY = 0;
+
         // 달팽이 배열 출력
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 System.out.print(snail[i][j] + " ");
+                if (snail[i][j] == M) {
+                    ansX = i + 1;
+                    ansY = j + 1;
+                }
             }
             System.out.println();
         }
-        
-        // 달팽이 배열 탐색하면서 해당값(M) 좌표 출력
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (snail[i][j] == M) {
-                    System.out.println((i + 1) + " " + (j + 1));
-                }
-            }
-        }
-    }
 
+        // 달팽이 배열 탐색하면서 해당값(M) 좌표 출력
+        System.out.println(ansX + " " + ansY);
+    }
 }
