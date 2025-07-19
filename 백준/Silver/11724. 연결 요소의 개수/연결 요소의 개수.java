@@ -27,26 +27,13 @@ public class Main {
             adj[w].add(v);
         }
 
-        // DFS 탐색
-        void DFS(int v) {
-            visited[v] = true;   // 방문함으로 변경
-
-            Iterator<Integer> it = adj[v].listIterator();
-            while (it.hasNext()) {
-                int n = it.next();
-                if (!visited[n]) {
-                    DFS(n);
-                }
-            }
-        }
-
         // 연결요소 찾기 함수
         int findCC() {
             int cc = 0;
 
             for (int i = 0; i < v; i++) {
                 if (!visited[i]) {  // 방문 안한 노드이면 DFS 탐색 후 카운트
-                    DFS(i);
+                    BFS(i);
                     cc++;
                 }
             }
@@ -54,6 +41,26 @@ public class Main {
             return cc;
         }
 
+        // BFS 탐색
+        void BFS(int v) {
+            LinkedList<Integer> queue = new LinkedList<>();
+
+            visited[v] = true;  //  방문했다고 표시
+            queue.add(v);   // 큐에 추가
+
+            while (queue.size() != 0) {
+                v = queue.poll();   // 방문한 노드를 큐에서 추출하고 출력
+
+                Iterator<Integer> it = adj[v].listIterator();
+                while (it.hasNext()) {    // 인접 노드 전부 탐색
+                    int n = it.next();
+                    if (!visited[n]) {   // 방문하지 않은 노드들은 표시
+                        visited[n] = true;
+                        queue.add(n);
+                    }
+                }
+            }
+        }
     }
 
     public static void main(String[] args) throws IOException {
@@ -82,3 +89,4 @@ public class Main {
         System.out.println(result);
     }
 }
+
