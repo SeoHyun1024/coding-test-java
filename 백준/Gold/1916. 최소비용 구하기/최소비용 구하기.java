@@ -3,81 +3,79 @@ import java.lang.*;
 import java.io.*;
 
 class Main {
-    public static long[] distance;
-    public static int[] prev;
-    public static List<List<Edge>> graph;
-    public static int N, M;
-    
-    
-    // 간선 클래스 정의
+    // 간선 정의
     static class Edge{
-        int destination;
-        int weight;
+        int to;
+        int cost;
         
-        Edge(int destination, int weight){
-            this.destination = destination;
-            this.weight = weight;
+        Edge(int to, int cost){
+            this.to = to;
+            this.cost = cost;
         }
     }
     
+    static int N, M;   // 도시, 버스 개수
+    static int start, depart;
+    static final long INF = Long.MAX_VALUE;
+    static List<Edge>[] graph;
+    static long[] dist;
+    
 	public static void main (String[] args) throws java.lang.Exception {
-	    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	    BufferedReader br =  new BufferedReader(new InputStreamReader(System.in));
+	    StringTokenizer st;
+	     
+	    N = Integer.parseInt(br.readLine());
+	    M = Integer.parseInt(br.readLine());
 	    
-	    // N, M 입력
-	    N = Integer.parseInt(br.readLine());   // 도시의 갯수 (노드 갯수)
-	    M = Integer.parseInt(br.readLine());   // 버스의 갯수 (간선 갯수)
+	    graph = new ArrayList[N + 1];
+	    dist = new long[N + 1];
 	    
-	    graph = new ArrayList<>(N + 1); // 그래프 초기화
+	    // graph 초기화
+	    for (int i = 1; i <= N; i++){
+	        graph[i] = new ArrayList<>();
+	    }
 	    
-	    for (int i = 0; i <= N; i++) graph.add(new ArrayList<>());
+	    // graph 입력
+	    for (int i = 0; i < M; i++){
+	        st = new StringTokenizer(br.readLine());
+	        int from = Integer.parseInt(st.nextToken());
+	        int to = Integer.parseInt(st.nextToken());
+	        int cost = Integer.parseInt(st.nextToken());
+	        
+	        graph[from].add(new Edge(to, cost));
+	    }
 	    
-	    // 배열 초기화
-        distance = new long[N + 1];
-        prev = new int[N + 1];
-        Arrays.fill(distance, Long.MAX_VALUE / 4);
-        Arrays.fill(prev, -1);
-        
-        for (int i = 0; i <  M; i++){
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int u = Integer.parseInt(st.nextToken());
-            int v = Integer.parseInt(st.nextToken());
-            int w = Integer.parseInt(st.nextToken());
-            
-            graph.get(u).add(new Edge(v, w));   // 간선 추가
-        }
-        
-        StringTokenizer st1 = new StringTokenizer(br.readLine());
-        int start = Integer.parseInt(st1.nextToken());
-        int destination = Integer.parseInt(st1.nextToken());
-        
-        dijkstra(start);
-        
-        System.out.println(distance[destination]);
-        
+	    // 출발지, 도착지 입력
+	    st = new StringTokenizer(br.readLine());
+	    start = Integer.parseInt(st.nextToken());
+	    depart = Integer.parseInt(st.nextToken());
+	    
+	    dijkstra(start);
 
-	    
+	    System.out.println(dist[depart]);
 	}
 	
-	public static void dijkstra(int start){
-	    PriorityQueue<long[]> pq = new PriorityQueue<>(Comparator.comparingLong(a -> a[0]));
-	    distance[start] = 0;
-	    pq.offer(new long[]{0L, start});
+	static public void dijkstra(int start){
+	    // dist 초기화
+	    Arrays.fill(dist, INF);
+	    dist[start] = 0;
+	    
+	    PriorityQueue<Edge> pq = new PriorityQueue<>((a, b) -> Long.compare(a.cost, b.cost));
+	    pq.offer(new Edge(start, 0));
 	    
 	    while(!pq.isEmpty()){
-	        long[] cur = pq.poll();
-	        long d = cur[0];
-	        int u = (int) cur[1];
+	        Edge now = pq.poll();
+	        int cur = now.to;
+	        int cost = now.cost;
 	        
-	        if (d != distance[u]) continue; // 더 좋은 경우로 갱신된 경우 스킵
+	        if(cost > dist[cur]) continue;
 	        
-	        for (Edge e : graph.get(u)){
-	            int v = e.destination;
-	            long nd = d + e.weight; // 가중치 합산하여 새로운 거리 저장
+	        for(Edge next : graph[cur]){
+	            long nextCost = cost + next.cost;
 	            
-	            if (nd < distance[v]){
-	                distance[v] = nd;
-	                prev[v] = u;
-	                pq.offer(new long[]{nd, v});
+	            if(nextCost < dist[next.to]){
+	                dist[next.to] = nextCost;
+	                pq.offer(new Edge(next.to, (int) nextCost));
 	            }
 	        }
 	    }
