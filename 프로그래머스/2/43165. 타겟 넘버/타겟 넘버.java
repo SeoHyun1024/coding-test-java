@@ -1,20 +1,24 @@
-class Solution {
-    public static int count = 0;
+import java.util.*;
 
-    public static int solution(int[] numbers, int target) {
+class Solution {    
+    int cnt = 0;
+    public int solution(int[] numbers, int target) {
+        int answer = 0;
+        
         dfs(numbers, 0, 0, target);
-
-        return count;
+        answer = cnt;
+        
+        return answer;
     }
-
-    public static void dfs(int[] numbers, int idx, int sum, int target) {
-        if (idx == numbers.length) {
-            if (sum == target) {
-                count++;
+    
+    void dfs(int[] numbers, int idx, int sum, int target){
+        if(idx >= numbers.length){
+            if(sum == target){
+                cnt++;
             }
             return;
         }
-
+        
         dfs(numbers, idx + 1, sum + numbers[idx], target);
         dfs(numbers, idx + 1, sum - numbers[idx], target);
     }
